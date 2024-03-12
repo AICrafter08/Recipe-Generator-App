@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/@lottiefiles/lottie-player"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 50px;
+            position: relative;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        input {
+            padding: 13px;
+            width: 80%;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        button {
+            width: 15%;
+            padding: 13px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result-container {
+            margin-top: 20px;
+        }
+
+        .response-background {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        #loading {
+            display: none; /* Hide initially */
+            position: fixed; /* Position fixed to keep it centered */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Centering trick */
+        }
+
+        #loader {
+			height: 300px;
+			width: 300px;
+            background-color: transparent;
+		}
+
+        #api-key-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #api-key-popup {
+            width: 300px; /* Set your desired width */
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            z-index: 1000;
+        }
+
+        #api-key-popup form {
+            width: 100%; /* Make the form width 100% */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #api-key-popup input {
+            width: calc(100% - 20px); /* Adjust the width as needed, considering padding */
+            }
+
+        #api-key-popup button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #api-key-popup button.close {
+            background-color: #ddd;
+            color: black;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Recipe Generator</h1>
+        <button id="api-key-button" onclick="showApiKeyPopup()">Set API Key</button>
+
+        <!-- API Key Popup -->
+        <div id="api-key-popup">
+            <h2>Set API Key</h2>
+            <form method = 'post' onsubmit="saveApiKey()">
+                <label for="api-key-input">API Key:</label>
+                <input type="text" id="api-key-input" name="api_key" required>
+                <button type="submit">Save</button>
+                <button type="button" class="close" onclick="hideApiKeyPopup()">Close</button>
+            </form>
+        </div>
+
+        <form method="post" onsubmit="showLoading()"> <!-- Call showLoading() on form submission -->
+            <input type="text" name="user_input" placeholder="Type your ingredients here..." value="{{ user_input }}">
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Loading div -->
+        <div id="loading">
+            <lottie-player id="loader" src="{{ url_for('static', filename='loading.json') }}" autoplay loop></lottie-player>
+        </div>
+
+        {% if user_input %}
+        <div class="result-container">
+            <div class="response-background">
+                <!-- <p><strong>User Input:</strong> {{ user_input }}</p>
+                    <p><strong>ChatGPT Response:</strong></p> -->
+                <div id="chatgpt-response"></div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+            <script>
+                var response = `{{ response | safe }}`;
+                var md = window.markdownit();
+                document.getElementById('chatgpt-response').innerHTML = md.render(response);
+
+                // Set the title
+                document.title = "Recipe Generator APP";
+            </script>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function showApiKeyPopup() {
+            document.getElementById('api-key-popup').style.display = 'block';
+        }
+
+        function hideApiKeyPopup() {
+            document.getElementById('api-key-popup').style.display = 'none';
+        }
+
+        function saveApiKey() {
+            // Add logic to save API key here (e.g., send it to the server)
+            alert("API Key saved!");
+            hideApiKeyPopup();
+            return false; // Prevent form submission
+        }
+    </script>
+</body>
+
+</html>
